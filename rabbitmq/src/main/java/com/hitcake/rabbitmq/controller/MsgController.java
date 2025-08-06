@@ -22,5 +22,10 @@ public class MsgController {
         rabbitTemplate.convertAndSend(RabbitMQConfiguration.WORK_QUEUE, msg);
         return "ok";
     }
+    @GetMapping("fanout/send")
+    public String sendFanout(@RequestParam String msg) {
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.FANOUT_EXCHANGE, "", msg);
+        return "ok";
+    }
 
 }
