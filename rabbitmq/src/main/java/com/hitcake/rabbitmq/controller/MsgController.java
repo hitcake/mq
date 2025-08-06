@@ -5,8 +5,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/rabbitmq")
 public class MsgController {
@@ -15,8 +13,13 @@ public class MsgController {
     private RabbitTemplate rabbitTemplate;
 
     @GetMapping("helloworld/send")
-    public String send(@RequestParam String msg) {
-        rabbitTemplate.convertAndSend(RabbitMQConfiguration.QUEUE, msg);
+    public String sendHelloworld(@RequestParam String msg) {
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.HELLOWORLD_QUEUE, msg);
+        return "ok";
+    }
+    @GetMapping("workqueue/send")
+    public String sendWorkQueue(@RequestParam String msg) {
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.WORK_QUEUE, msg);
         return "ok";
     }
 

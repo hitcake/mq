@@ -7,9 +7,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
-    public static final String QUEUE = "helloworld.queue";
+    public static final String HELLOWORLD_QUEUE = "helloworld.queue";
+    public static final String WORK_QUEUE = "work.queue";
+
     @Bean
     public Queue helloWorldQueue() {
-        return new Queue(QUEUE, true);
+        return new Queue(HELLOWORLD_QUEUE, true);
+    }
+
+    @Bean
+    public Queue workQueue() {
+        return new Queue(WORK_QUEUE, true);
     }
 }
