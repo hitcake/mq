@@ -32,5 +32,11 @@ public class MsgController {
         rabbitTemplate.convertAndSend(RabbitMQConfiguration.DIRECT_EXCHANGE, color, msg);
         return "ok";
     }
+    @GetMapping("topic/send")
+    public String sendTopic(@RequestParam String msg,@RequestParam String routingKey) {
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.TOPIC_EXCHANGE, routingKey, msg);
+        return "ok";
+    }
+
 
 }

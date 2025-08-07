@@ -17,6 +17,9 @@ public class RabbitMQConfiguration {
     public static final String DIRECT_QUEUE1 = "direct.queue1";
     public static final String DIRECT_QUEUE2 = "direct.queue2";
 
+    public static final String TOPIC_EXCHANGE = "topic.exchange";
+    public static final String TOPIC_QUEUE1 = "topic.queue1";
+    public static final String TOPIC_QUEUE2 = "topic.queue2";
     /**
      * Helloworld 模式 1对1
      */
@@ -81,5 +84,29 @@ public class RabbitMQConfiguration {
     @Bean
     public Binding bindingDirectQueue2() {
         return BindingBuilder.bind(directQueue2()).to(directExchange()).with("blue");
+    }
+
+    /**
+     * topic 模式 通配符
+     */
+    @Bean
+    public Queue topicQueue1() {
+        return new Queue(TOPIC_QUEUE1, true);
+    }
+    @Bean
+    public Queue topicQueue2() {
+        return new Queue(TOPIC_QUEUE2, true);
+    }
+    @Bean
+    public TopicExchange topicExchange() {
+        return new TopicExchange(TOPIC_EXCHANGE,true,false);
+    }
+     @Bean
+    public Binding bindingTopicQueue1() {
+         return BindingBuilder.bind(topicQueue1()).to(topicExchange()).with("china.#");
+    }
+    @Bean
+    public Binding bindingTopicQueue2() {
+        return BindingBuilder.bind(topicQueue2()).to(topicExchange()).with("#.news");
     }
 }
