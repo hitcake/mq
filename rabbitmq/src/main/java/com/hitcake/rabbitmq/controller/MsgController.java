@@ -27,5 +27,10 @@ public class MsgController {
         rabbitTemplate.convertAndSend(RabbitMQConfiguration.FANOUT_EXCHANGE, "", msg);
         return "ok";
     }
+    @GetMapping("direct/send")
+    public String sendDirect1(@RequestParam String msg,@RequestParam String color) {
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.DIRECT_EXCHANGE, color, msg);
+        return "ok";
+    }
 
 }

@@ -1,9 +1,6 @@
 package com.hitcake.rabbitmq.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +12,10 @@ public class RabbitMQConfiguration {
     public static final String FANOUT_EXCHANGE = "fanout.exchange";
     public static final String FANOUT_QUEUE1 = "fanout.queue1";
     public static final String FANOUT_QUEUE2 = "fanout.queue2";
+
+    public static final String DIRECT_EXCHANGE = "direct.exchange";
+    public static final String DIRECT_QUEUE1 = "direct.queue1";
+    public static final String DIRECT_QUEUE2 = "direct.queue2";
 
     /**
      * Helloworld 模式 1对1
@@ -56,5 +57,29 @@ public class RabbitMQConfiguration {
     @Bean
     public Binding bindingFanoutQueue2() {
         return BindingBuilder.bind(fanoutQueue2()).to(fanoutExchange());
+    }
+
+    /**
+     * direct 模式 定向
+     */
+    @Bean
+    public Queue directQueue1() {
+        return new Queue(DIRECT_QUEUE1, true);
+    }
+    @Bean
+    public Queue directQueue2() {
+        return new Queue(DIRECT_QUEUE2, true);
+    }
+    @Bean
+    public DirectExchange directExchange() {
+        return new DirectExchange(DIRECT_EXCHANGE,true,false);
+    }
+     @Bean
+    public Binding bindingDirectQueue1() {
+         return BindingBuilder.bind(directQueue1()).to(directExchange()).with("red");
+    }
+    @Bean
+    public Binding bindingDirectQueue2() {
+        return BindingBuilder.bind(directQueue2()).to(directExchange()).with("blue");
     }
 }
