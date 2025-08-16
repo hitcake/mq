@@ -101,7 +101,21 @@ public class MsgController {
         }catch (Exception e){
             return e.getMessage();
         }
-
+    }
+    @PostMapping("headers/send")
+    public String sendHeaders(@RequestBody User user,@RequestParam String headerKey,@RequestParam String headerValue) {
+        try{
+            String json = objectMapper.writeValueAsString(user);
+            MessageProperties messageProperties = new MessageProperties();
+            messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
+            messageProperties.getHeaders().put("__TypeId__","user");
+            messageProperties.getHeaders().put(headerKey,headerValue);
+            Message message = new Message(json.getBytes(),messageProperties);
+            rabbitTemplate.convertAndSend(RabbitMQConfiguration.HEADERS_EXCHANGE, "", message);
+            return "ok";
+        }catch (Exception e){
+            return e.getMessage();
+        }
     }
 
     private Message buildMessage(User user) throws JsonProcessingException {

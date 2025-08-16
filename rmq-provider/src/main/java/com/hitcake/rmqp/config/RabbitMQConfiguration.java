@@ -11,6 +11,9 @@ import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Configuration
 public class RabbitMQConfiguration {
@@ -28,6 +31,11 @@ public class RabbitMQConfiguration {
     public static final String TOPIC_EXCHANGE = "topic.exchange";
     public static final String TOPIC_QUEUE1 = "topic.queue1";
     public static final String TOPIC_QUEUE2 = "topic.queue2";
+
+    public static final String HEADERS_EXCHANGE = "headers.exchange";
+    public static final String HEADERS_QUEUE1 = "headers.queue1";
+    public static final String HEADERS_QUEUE2 = "headers.queue2";
+    public static final String HEADERS_QUEUE3 = "headers.queue3";
     /**
      * Helloworld 模式 1对1
      */
@@ -118,6 +126,39 @@ public class RabbitMQConfiguration {
         return BindingBuilder.bind(topicQueue2()).to(topicExchange()).with("#.news");
     }
 
-
+    /**
+     * headers 模式 复杂匹配
+     */
+    @Bean
+    public Queue headersQueue1() {
+        return  new Queue(HEADERS_QUEUE1, true);
+    }
+    @Bean
+    public Queue headersQueue2() {
+        return new Queue(HEADERS_QUEUE2, true);
+    }
+    @Bean
+    public Queue headersQueue3() {
+        return new Queue(HEADERS_QUEUE3, true);
+    }
+    @Bean
+    public HeadersExchange headersExchange() {
+        return new HeadersExchange(HEADERS_EXCHANGE, true, false);
+    }
+    @Bean
+    public Binding bindingHeadersQueue1() {
+        return BindingBuilder.bind(headersQueue1()).to(headersExchange()).where("company").matches("apple");
+    }
+    @Bean
+    public Binding bindingHeadersQueue2() {
+        Map<String,Object> map = new HashMap<>();
+        map.put("company","apple");
+        map.put("nationality","china");
+        return BindingBuilder.bind(headersQueue2()).to(headersExchange()).whereAny(map).match();
+    }
+    @Bean
+    public Binding bindingHeadersQueue3() {
+        return BindingBuilder.bind(headersQueue3()).to(headersExchange()).whereAny("company","language").exist();
+    }
 
 }
