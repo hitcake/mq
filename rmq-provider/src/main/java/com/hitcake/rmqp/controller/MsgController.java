@@ -4,14 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hitcake.rmqp.config.RabbitMQConfiguration;
 import com.hitcake.rmqp.model.User;
+import com.rabbitmq.client.AMQP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/rabbitmq")
@@ -108,6 +111,29 @@ public class MsgController {
             Message message = new Message(json.getBytes(),messageProperties);
             rabbitTemplate.convertAndSend(RabbitMQConfiguration.HEADERS_EXCHANGE, "", message);
             return "ok";
+        }catch (Exception e){
+            return e.getMessage();
+        }
+    }
+    @PostMapping("rpc/send")
+    public String sendRpc(@RequestBody User user) {
+        try{
+            String corrId = UUID.randomUUID().toString();
+            String json = objectMapper.writeValueAsString(user);
+            MessageProperties messageProperties = new MessageProperties();
+            messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
+            messageProperties.getHeaders().put("__TypeId__","user");
+            messageProperties.setCorrelationId(corrId);
+            messageProperties.setReplyTo(RabbitMQConfiguration.RPC_REPLY_QUEUE);
+            Message message = new Message(json.getBytes(),messageProperties);
+            Message reply = rabbitTemplate.sendAndReceive(RabbitMQConfiguration.RPC_EXCHANGE, "req", message);
+            if (reply != null) {
+                String resp = new String(reply.getBody());
+                user = objectMapper.readValue(resp, User.class);
+                return "rpc调用结果: "+ objectMapper.writeValueAsString(user);
+            } else {
+                return "rpc调用结果: null";
+            }
         }catch (Exception e){
             return e.getMessage();
         }

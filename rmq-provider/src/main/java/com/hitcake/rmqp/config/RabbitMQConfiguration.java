@@ -30,6 +30,10 @@ public class RabbitMQConfiguration {
     public static final String HEADERS_QUEUE1 = "headers.queue1";
     public static final String HEADERS_QUEUE2 = "headers.queue2";
     public static final String HEADERS_QUEUE3 = "headers.queue3";
+
+    public static final String RPC_EXCHANGE = "rpc.exchange";
+    public static final String RPC_REQ_QUEUE = "rpc.req.queue";
+    public static final String RPC_REPLY_QUEUE = "rpc.reply.queue";
     /**
      * Helloworld 模式 1对1
      */
@@ -155,4 +159,27 @@ public class RabbitMQConfiguration {
         return BindingBuilder.bind(headersQueue3()).to(headersExchange()).whereAny("company","language").exist();
     }
 
+    /**
+     * rpc 模式 远程调用
+     */
+    @Bean
+    public Queue rpcReqQueue() {
+        return new Queue(RPC_REQ_QUEUE, true);
+    }
+    @Bean
+    public Queue rpcReplyQueue() {
+        return new Queue(RPC_REPLY_QUEUE, true);
+    }
+    @Bean
+    public DirectExchange rpcExchange() {
+        return new DirectExchange(RPC_EXCHANGE,true,false);
+    }
+    @Bean
+    public Binding bindingRpcReqQueue() {
+        return BindingBuilder.bind(rpcReqQueue()).to(rpcExchange()).with("req");
+    }
+    @Bean
+    public Binding bindingRpcReplyQueue() {
+        return BindingBuilder.bind(rpcReplyQueue()).to(rpcExchange()).with("reply");
+    }
 }
