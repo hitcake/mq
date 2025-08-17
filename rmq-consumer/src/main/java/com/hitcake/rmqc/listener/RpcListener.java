@@ -14,7 +14,7 @@ import java.io.IOException;
 @Component
 @RabbitListener(queues = "rpc.req.queue")
 public class RpcListener {
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @RabbitHandler
     public void process(User user, Channel channel, Message message) throws IOException {
         String correlationId = message.getMessageProperties().getCorrelationId();
