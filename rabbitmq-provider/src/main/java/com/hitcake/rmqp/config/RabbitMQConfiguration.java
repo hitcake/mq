@@ -34,12 +34,21 @@ public class RabbitMQConfiguration {
     public static final String RPC_EXCHANGE = "rpc.exchange";
     public static final String RPC_REQ_QUEUE = "rpc.req.queue";
     public static final String RPC_REPLY_QUEUE = "rpc.reply.queue";
+
+    public static final String DEAD_LETTER_EXCHANGE = "dead.letter.exchange";
+    public static final String DEAD_LETTER_QUEUE = "dead.letter.queue";
+
     /**
      * Helloworld 模式 1对1
      */
     @Bean
     public Queue helloWorldQueue() {
-        return new Queue(HELLOWORLD_QUEUE, true);
+        QueueBuilder queueBuilder = QueueBuilder.durable(HELLOWORLD_QUEUE);
+        queueBuilder.withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE);
+        queueBuilder.withArgument("x-dead-letter-routing-key", "dead");
+        queueBuilder.withArgument("x-message-ttl", 60000);
+        queueBuilder.withArgument("x-max-length", 10);
+        return queueBuilder.build();
     }
 
     /**
@@ -181,5 +190,21 @@ public class RabbitMQConfiguration {
     @Bean
     public Binding bindingRpcReplyQueue() {
         return BindingBuilder.bind(rpcReplyQueue()).to(rpcExchange()).with("reply");
+    }
+
+    /**
+     * 死信队列
+     */
+    @Bean
+    public Queue deadLetterQueue() {
+        return new Queue(DEAD_LETTER_QUEUE, true);
+    }
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DEAD_LETTER_EXCHANGE,true,false);
+    }
+    @Bean
+    public Binding bindingDeadLetterQueue() {
+        return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with("dead");
     }
 }
