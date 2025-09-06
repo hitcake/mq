@@ -18,7 +18,6 @@ public class RabbitMQConfiguration {
 
     /**
      * Helloworld 模式 1对1
-     * @return
      */
     @Bean
     public Queue helloWorldQueue() {
